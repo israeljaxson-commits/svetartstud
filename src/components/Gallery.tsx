@@ -146,8 +146,6 @@ export default function Gallery() {
     {
       id: 'post-3',
       image: 'https://vufenghjvgdfsatjxkac.supabase.co/storage/v1/object/public/gallery/image9.jpeg',
-      likes: 312,
-      comments: 48,
       treatment: st.post3.treatment,
       caption: st.post3.caption,
       tags: ['#LashLamination', '#InLeiLashFiller', '#EyeGaze', '#EyelashPerm'],
