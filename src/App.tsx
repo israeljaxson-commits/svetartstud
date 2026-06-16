@@ -2,7 +2,7 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
-
+import CalendarBooking from './components/CalendarBooking';
 import { useState, FormEvent, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
@@ -131,7 +131,7 @@ export default function App() {
 
           {/* 5. Customer Reviews Section */}
           <Reviews />
-
+          <CalendarBooking />
           {/* 6. Contact, Promotions & FAQ Section */}
           <ContactAndFAQ
             selectedServiceName={selectedService}
