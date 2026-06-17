@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function BookingSystem() {
   const [name, setName] = useState('');
@@ -7,6 +7,27 @@ export default function BookingSystem() {
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
   const [specialRequest, setSpecialRequest] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+  const [nextUrl, setNextUrl] = useState('');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setNextUrl(`${window.location.origin}${window.location.pathname}?booking=success`);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('booking') === 'success') {
+        setSubmitted(true);
+        params.delete('booking');
+        const newSearch = params.toString();
+        const newUrl = `${window.location.pathname}${newSearch ? `?${newSearch}` : ''}`;
+        window.history.replaceState({}, document.title, newUrl);
+      }
+    }
+  }, []);
 
   return (
     <section id="booking" className="py-28 bg-[#F8F0EE]">
@@ -17,6 +38,12 @@ export default function BookingSystem() {
           <p className="mt-4 text-base text-stone-600">Enter your name, phone, preferred date and time. The owner receives an email immediately when you submit.</p>
         </div>
 
+        {submitted && (
+          <div className="mb-6 rounded-[30px] border border-emerald-200 bg-emerald-50 px-6 py-4 text-sm text-emerald-800 shadow-sm">
+            Your booking request was sent successfully. Thank you!
+          </div>
+        )}
+
         <form
           action="https://formsubmit.co/learsiando%40gmail.com"
           method="POST"
@@ -24,7 +51,7 @@ export default function BookingSystem() {
         >
           <input type="hidden" name="_subject" value="New booking request from SvetArt" />
           <input type="hidden" name="_captcha" value="false" />
-          <input type="hidden" name="_next" value="https://svetartstud.vercel.app" />
+          <input type="hidden" name="_next" value={nextUrl || 'https://svetartstud.vercel.app/?booking=success'} />
 
           <label className="block">
             <span className="text-sm font-semibold text-stone-700">Full name</span>
@@ -98,7 +125,6 @@ export default function BookingSystem() {
               value={specialRequest}
               onChange={(e) => setSpecialRequest(e.target.value)}
               placeholder="Any special requests or preferences"
-              required
               rows={4}
               className="mt-3 w-full rounded-3xl border border-[#D7C6C0] bg-[#FCF7F5] px-5 py-4 text-sm text-stone-900 outline-none transition focus:border-[#D9A7A7] focus:ring-2 focus:ring-[#F2D5D2]/60"
             />
