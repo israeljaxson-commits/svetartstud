@@ -9,12 +9,21 @@ export default function BookingSystem() {
   const [specialRequest, setSpecialRequest] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [nextUrl, setNextUrl] = useState('');
+  const [minDate, setMinDate] = useState('');
+  const [minTime, setMinTime] = useState('');
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      const now = new Date();
+      const isoDate = now.toISOString().split('T')[0];
+      const isoTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
       setNextUrl(`${window.location.origin}${window.location.pathname}?booking=success`);
+      setMinDate(isoDate);
+      setMinTime(isoTime);
     }
   }, []);
+
+  const effectiveMinTime = date === minDate ? minTime : '00:00';
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -101,6 +110,7 @@ export default function BookingSystem() {
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
                 required
+                min={minDate}
                 className="mt-3 w-full rounded-3xl border border-[#D7C6C0] bg-[#FCF7F5] px-5 py-4 text-sm text-stone-900 outline-none transition focus:border-[#D9A7A7] focus:ring-2 focus:ring-[#F2D5D2]/60"
               />
             </label>
@@ -113,13 +123,14 @@ export default function BookingSystem() {
                 value={time}
                 onChange={(e) => setTime(e.target.value)}
                 required
+                min={effectiveMinTime}
                 className="mt-3 w-full rounded-3xl border border-[#D7C6C0] bg-[#FCF7F5] px-5 py-4 text-sm text-stone-900 outline-none transition focus:border-[#D9A7A7] focus:ring-2 focus:ring-[#F2D5D2]/60"
               />
             </label>
           </div>
 
           <label className="block">
-            <span className="text-sm font-semibold text-stone-700">Special request</span>
+            <span className="text-sm font-semibold text-stone-700">Special request <span className="text-stone-500">(optional)</span></span>
             <textarea
               name="specialRequest"
               value={specialRequest}
