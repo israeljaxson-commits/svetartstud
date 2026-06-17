@@ -69,7 +69,7 @@ export default function AdminBookings() {
     <section id="admin" className="py-20">
       <div className="max-w-5xl mx-auto px-6">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="font-serif text-2xl font-bold">Admin — Bookings</h3>
+          <h3 className="font-serif text-2xl font-bold">Bookings</h3>
           <div className="flex items-center gap-3">
             <button onClick={fetchServerBookings} className="px-3 py-2 rounded bg-white border">Refresh</button>
             <button onClick={handleExportJSON} className="px-3 py-2 rounded rose-gold-gradient text-white">Export JSON</button>
