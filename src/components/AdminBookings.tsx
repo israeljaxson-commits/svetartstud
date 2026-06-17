@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { Booking } from './CalendarBooking';
 
@@ -25,25 +25,6 @@ export default function AdminBookings() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    fetchServerBookings();
-  }, []);
-
-  const fetchServerBookings = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch('/api/bookings');
-      if (!res.ok) throw new Error('Failed to fetch bookings');
-      const data = await res.json();
-      setBookings(data || []);
-      setError('');
-    } catch (e: any) {
-      setError(e.message || String(e));
-      setBookings([]);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleExportJSON = () => {
     download('bookings.json', JSON.stringify(bookings, null, 2));
@@ -55,14 +36,7 @@ export default function AdminBookings() {
   };
 
   const handleClearServer = async () => {
-    if (!confirm('Clear all bookings on server? This cannot be undone.')) return;
-    try {
-      const res = await fetch('/api/bookings', { method: 'DELETE' });
-      if (!res.ok) throw new Error('Failed to clear');
-      setBookings([]);
-    } catch (e: any) {
-      setError(e.message || 'Failed to clear server bookings');
-    }
+    setError('Server booking API integration has been removed.');
   };
 
   return (
@@ -71,10 +45,8 @@ export default function AdminBookings() {
         <div className="flex items-center justify-between mb-6">
           <h3 className="font-serif text-2xl font-bold">Bookings</h3>
           <div className="flex items-center gap-3">
-            <button onClick={fetchServerBookings} className="px-3 py-2 rounded bg-white border">Refresh</button>
             <button onClick={handleExportJSON} className="px-3 py-2 rounded rose-gold-gradient text-white">Export JSON</button>
             <button onClick={handleExportCSV} className="px-3 py-2 rounded bg-[#2C2523] text-white">Export CSV</button>
-            <button onClick={handleClearServer} className="px-3 py-2 rounded bg-rose-600 text-white">Clear Server</button>
           </div>
         </div>
 
