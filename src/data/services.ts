@@ -5,6 +5,7 @@ import eyelashLaminationImage from '../../assets/gallery/eyelash-lamination.jpg'
 import hygienicPedicureImage from '../../assets/gallery/hygienic-pedicure.jpg';
 import aestheticPedicureImage from '../../assets/gallery/aesthetic-pedicure.jpg';
 import eyebrowLaminationImage from '../../assets/gallery/eyebrow-lamination.jpg';
+import pedicureCourseImage from '../../assets/gallery/pedicure-course.jpg';
 
 export const BOOKING_SERVICE_OPTIONS = [
   'Hygienic Manicure',
@@ -227,7 +228,7 @@ export const SALON_SERVICES: ServiceItem[] = [
     id: 'pedicure-course',
     bookingName: 'Pedicure Course',
     category: 'pedicure',
-    image: 'https://images.unsplash.com/photo-1519824145375-904d644dd4c6?q=80&w=600',
+    image: pedicureCourseImage,
     en: {
       name: 'Pedicure Course',
       price: '200€',
@@ -239,7 +240,7 @@ export const SALON_SERVICES: ServiceItem[] = [
       name: 'Curs Pedichiură',
       price: '200€',
       materials: 'Kit profesional de training pedichiură',
-      description: 'Curs profesional de pedichiură: tehnică sterilă, anatomia piciorului și abilități pentru clienți.',
+      description: 'Curs profesional de pedichiură: tehnică sterilă, anatomia piciorului și abilitați pentru clienți.',
       features: ['Training practic pentru picioare', 'Stăpânirea fluxului steril', 'Certificare profesională', 'Sesiuni conduse de expert'],
     },
     ru: {
