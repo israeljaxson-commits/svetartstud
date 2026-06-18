@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { BOOKING_SERVICE_OPTIONS } from '../data/services';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -87,7 +87,6 @@ const bookingFormT = {
 
 export default function BookingSystem({ preselectedService = '' }) {
   const formRef = useRef(null);
-  const allowNativeSubmitRef = useRef(false);
   const { lang } = useLanguage();
   const header = bookingHeaderT[lang] || bookingHeaderT.en;
   const formT = bookingFormT[lang] || bookingFormT.en;
@@ -99,12 +98,10 @@ export default function BookingSystem({ preselectedService = '' }) {
   const [time, setTime] = useState('');
   const [specialRequest, setSpecialRequest] = useState('');
   const [submitted, setSubmitted] = useState(false);
-  const [submitError, setSubmitError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [nextUrl, setNextUrl] = useState('');
   const [minDate, setMinDate] = useState('');
   const [minTime, setMinTime] = useState('');
-  const [bookedSlotsForDate, setBookedSlotsForDate] = useState([]);
 
   const defaultNextUrl = typeof window !== 'undefined'
     ? `${window.location.origin}${window.location.pathname}?booking=success`
@@ -128,45 +125,6 @@ export default function BookingSystem({ preselectedService = '' }) {
   }, [preselectedService]);
 
   useEffect(() => {
-    if (!date) {
-      setBookedSlotsForDate([]);
-      setTime('');
-      return;
-    }
-
-    const controller = new AbortController();
-
-    const fetchAvailability = async () => {
-      try {
-        const response = await fetch(`/api/availability?date=${encodeURIComponent(date)}`, {
-          signal: controller.signal,
-        });
-        if (!response.ok) {
-          throw new Error('availability_request_failed');
-        }
-        const data = await response.json();
-        const bookedSlots = Array.isArray(data.bookedSlots) ? data.bookedSlots : [];
-        setBookedSlotsForDate(bookedSlots);
-      } catch (_error) {
-        if (!controller.signal.aborted) {
-          setBookedSlotsForDate([]);
-        }
-      }
-    };
-
-    fetchAvailability();
-
-    return () => controller.abort();
-  }, [date]);
-
-  useEffect(() => {
-    if (!time) return;
-    if (bookedSlotsForDate.includes(time)) {
-      setTime('');
-    }
-  }, [bookedSlotsForDate, time]);
-
-  useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       if (params.get('booking') === 'success') {
@@ -181,78 +139,23 @@ export default function BookingSystem({ preselectedService = '' }) {
 
   useEffect(() => {
     if (!submitted) return;
-    const timer = window.setTimeout(() => setSubmitted(false), 5000);
+    const timer = window.setTimeout(() => setSubmitted(false), 8000);
     return () => window.clearTimeout(timer);
   }, [submitted]);
 
   const isTimeSlotUnavailable = (slot) => {
     if (!date) return false;
-    if (bookedSlotsForDate.includes(slot)) return true;
     if (date === minDate && minTime && slot < minTime) return true;
     return false;
   };
 
-  const handleSubmit = async (e) => {
-    if (allowNativeSubmitRef.current) {
-      allowNativeSubmitRef.current = false;
+  const handleSubmit = (e) => {
+    if (!date || !time) {
+      e.preventDefault();
       return;
     }
-
-    e.preventDefault();
-
-    if (!date || !time) return;
-
-    if (isTimeSlotUnavailable(time)) {
-      setSubmitError(formT.timeUnavailableError);
-      return;
-    }
-
-    setSubmitError('');
     setIsSubmitting(true);
-
-    try {
-      const response = await fetch('/api/bookings/reserve', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          service,
-          name,
-          email,
-          phone,
-          date,
-          time,
-          specialRequest,
-        }),
-      });
-
-      if (response.status === 409) {
-        setSubmitError(formT.timeUnavailableError);
-        const availabilityRes = await fetch(`/api/availability?date=${encodeURIComponent(date)}`);
-        if (availabilityRes.ok) {
-          const availabilityData = await availabilityRes.json();
-          const bookedSlots = Array.isArray(availabilityData.bookedSlots) ? availabilityData.bookedSlots : [];
-          setBookedSlotsForDate(bookedSlots);
-        }
-        setIsSubmitting(false);
-        return;
-      }
-
-      if (!response.ok) {
-        setSubmitError(formT.genericSubmitError);
-        setIsSubmitting(false);
-        return;
-      }
-
-      allowNativeSubmitRef.current = true;
-      if (formRef.current) {
-        formRef.current.submit();
-      }
-    } catch (_e) {
-      setSubmitError(formT.genericSubmitError);
-      setIsSubmitting(false);
-    }
+    // Allow the native form to submit directly to formsubmit.co
   };
 
   return (
@@ -279,14 +182,7 @@ export default function BookingSystem({ preselectedService = '' }) {
           </div>
         )}
 
-        {submitError && (
-          <div className="mb-6 rounded-[30px] border border-rose-200 bg-rose-50 px-6 py-4 text-sm text-rose-800 shadow-sm">
-            {submitError}
-          </div>
-        )}
-
         <form
-          ref={formRef}
           action="https://formsubmit.co/svetart.beauty%40gmail.com"
           method="POST"
           onSubmit={handleSubmit}
