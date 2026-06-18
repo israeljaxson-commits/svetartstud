@@ -1,7 +1,31 @@
 import { useState, useEffect } from 'react';
 import { BOOKING_SERVICE_OPTIONS } from '../data/services';
+import { useLanguage } from '../context/LanguageContext';
+
+const bookingHeaderT = {
+  en: {
+    badge: 'Exclusive studio appointments',
+    eyebrow: 'Reserve your appointment',
+    title: 'Book Your Session',
+    subtitle: 'Select your service, enter your details and preferred date and time. The owner receives an email immediately when you submit.',
+  },
+  ro: {
+    badge: 'Programări exclusive în studio',
+    eyebrow: 'Rezervă-ți programarea',
+    title: 'Programează-ți Vizita',
+    subtitle: 'Selectează serviciul, completează datele tale și alege data și ora preferată. Proprietara primește imediat un email după trimitere.',
+  },
+  ru: {
+    badge: 'Эксклюзивные записи в студии',
+    eyebrow: 'Забронируйте визит',
+    title: 'Запишитесь на Сеанс',
+    subtitle: 'Выберите услугу, заполните свои данные и укажите удобные дату и время. После отправки владелица сразу получает письмо.',
+  },
+};
 
 export default function BookingSystem({ preselectedService = '' }) {
+  const { lang } = useLanguage();
+  const header = bookingHeaderT[lang] || bookingHeaderT.en;
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -63,14 +87,14 @@ export default function BookingSystem({ preselectedService = '' }) {
           <div className="absolute inset-x-0 -top-4 flex justify-center">
             <span className="inline-flex items-center gap-2 rounded-full border border-[#E8D2C7] bg-[#F9F4F1]/80 px-4 py-2 text-[10px] uppercase tracking-[0.35em] text-[#8C6D66] font-semibold shadow-sm backdrop-blur-sm">
               <span className="h-1.5 w-1.5 rounded-full bg-[#B67C7C] shadow-[0_0_10px_rgba(182,124,124,0.35)]"></span>
-              Exclusive studio appointments
+              {header.badge}
             </span>
           </div>
           <div className="relative pt-8">
-            <p className="text-sm uppercase tracking-[0.35em] text-[#8C6D66] font-semibold">Reserve your appointment</p>
-            <h2 className="mt-4 text-4xl md:text-5xl font-serif font-bold text-[#2C2523]">Book Your Session</h2>
+            <p className="text-sm uppercase tracking-[0.35em] text-[#8C6D66] font-semibold">{header.eyebrow}</p>
+            <h2 className="mt-4 text-4xl md:text-5xl font-serif font-bold text-[#2C2523]">{header.title}</h2>
             <div className="mx-auto mt-5 h-1.5 w-24 rounded-full bg-gradient-to-r from-[#B67C7C] via-[#E7D3C1] to-[#D8A3A3] shadow-soft" />
-            <p className="mt-6 text-base text-stone-600 max-w-2xl mx-auto">Select your service, enter your details and preferred date and time. The owner receives an email immediately when you submit.</p>
+            <p className="mt-6 text-base text-stone-600 max-w-2xl mx-auto">{header.subtitle}</p>
           </div>
         </div>
 
