@@ -1,5 +1,7 @@
 export type ServiceCategory = 'manicure' | 'pedicure' | 'lamination';
 
+import heelCareImage from '../../assets/gallery/heel-care.jpg';
+
 export const BOOKING_SERVICE_OPTIONS = [
   'Hygienic Manicure',
   'Manicure Correction',
@@ -194,7 +196,7 @@ export const SALON_SERVICES: ServiceItem[] = [
     id: 'heel-care',
     bookingName: 'Heel Care',
     category: 'pedicure',
-    image: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?q=80&w=600',
+    image: heelCareImage,
     en: {
       name: 'Heel Care',
       price: '120 MDL',

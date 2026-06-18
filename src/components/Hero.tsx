@@ -7,6 +7,9 @@ import { useState, MouseEvent } from 'react';
 import { ArrowRight, Sparkles, Star, ArrowDown } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useLanguage } from '../context/LanguageContext';
+import clientAvatar1 from '../assets/avatars/client-1.svg';
+import clientAvatar2 from '../assets/avatars/client-2.svg';
+import clientAvatar3 from '../assets/avatars/client-3.svg';
 
 interface HeroProps {
   onBookClick: () => void;
@@ -37,6 +40,7 @@ const localHeroT = {
 export default function Hero({ onBookClick }: HeroProps) {
   const { lang, t } = useLanguage();
   const lt = localHeroT[lang] || localHeroT.en;
+  const clientAvatars = [clientAvatar1, clientAvatar2, clientAvatar3];
 
   // Interactivity state for luxury 3D visual tilt
   const [coords, setCoords] = useState({ x: 0, y: 0 });
@@ -128,9 +132,14 @@ export default function Hero({ onBookClick }: HeroProps) {
             className="flex flex-wrap items-center gap-6 pt-2"
           >
             <div className="flex -space-x-3">
-              <img src="https://vufenghjvgdfsatjxkac.supabase.co/storage/v1/object/public/gallery/image9.jpeg" className="w-9 h-9 rounded-full border-2 border-[#F2E4DF] object-cover shadow-md" alt="Client" />
-              <img src="https://vufenghjvgdfsatjxkac.supabase.co/storage/v1/object/public/gallery/image9.jpeg" className="w-9 h-9 rounded-full border-2 border-[#F2E4DF] object-cover shadow-md" alt="Client" />
-              <img src="https://vufenghjvgdfsatjxkac.supabase.co/storage/v1/object/public/gallery/image9.jpeg" className="w-9 h-9 rounded-full border-2 border-[#F2E4DF] object-cover shadow-md" alt="Client" />
+              {clientAvatars.map((avatar, idx) => (
+                <img
+                  key={`hero-client-${idx}`}
+                  src={avatar}
+                  className="w-9 h-9 rounded-full border-2 border-[#F2E4DF] object-cover shadow-md"
+                  alt={`Client ${idx + 1}`}
+                />
+              ))}
             </div>
             <div className="space-y-0.5">
               <div className="flex items-center gap-1">
