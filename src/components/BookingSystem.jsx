@@ -56,6 +56,7 @@ const bookingFormT = {
     booked: 'Booked',
     timeUnavailableError: 'This time slot is no longer available. Please choose another time.',
     genericSubmitError: 'Unable to reserve this slot right now. Please try again.',
+    submitButton: 'Send Booking Request',
   },
   ro: {
     service: 'Serviciu',
@@ -74,6 +75,7 @@ const bookingFormT = {
     booked: 'Ocupat',
     timeUnavailableError: 'Acest interval orar nu mai este disponibil. Te rugăm să alegi altă oră.',
     genericSubmitError: 'Nu am putut rezerva acest interval acum. Te rugăm să încerci din nou.',
+    submitButton: 'Trimite Cererea de Rezervare',
   },
   ru: {
     service: 'Услуга',
@@ -92,6 +94,7 @@ const bookingFormT = {
     booked: 'Занято',
     timeUnavailableError: 'Это время уже недоступно. Пожалуйста, выберите другое.',
     genericSubmitError: 'Сейчас не удалось забронировать это время. Пожалуйста, попробуйте снова.',
+    submitButton: 'Отправить запрос на бронирование',
   },
 };
 
@@ -314,7 +317,7 @@ export default function BookingSystem({ preselectedService = '' }) {
             disabled={isSubmitting}
             className="mt-3 inline-flex items-center justify-center rounded-full bg-[#5D2F2A] px-7 py-4 text-sm font-bold uppercase tracking-[0.18em] text-white transition duration-300 hover:bg-[#7b473f] shadow-[0_14px_30px_rgba(93,47,42,0.16)] disabled:cursor-not-allowed disabled:bg-[#b6a2a0]"
           >
-            Send Booking Request
+            {formT.submitButton}
           </button>
         </form>
       </div>
