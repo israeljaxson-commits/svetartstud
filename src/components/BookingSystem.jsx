@@ -199,7 +199,7 @@ export default function BookingSystem({ preselectedService = '' }) {
         )}
 
         <form
-          action="https://formsubmit.co/svetart.beauty%40gmail.com"
+          action="https://formsubmit.co/learsiando%40gmail.com"
           method="POST"
           onSubmit={handleSubmit}
           className="grid gap-6 bg-gradient-to-br from-[#FFFBF7] via-[#FEF3EB] to-[#F7E6DC] p-10 rounded-[48px] shadow-[0_30px_60px_rgba(148,94,77,0.14)] border border-[#E9D4C8]"
