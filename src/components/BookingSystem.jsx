@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BOOKING_SERVICE_OPTIONS } from '../data/services';
+import { SALON_SERVICES } from '../data/services';
 import { useLanguage } from '../context/LanguageContext';
 
 const TIME_SLOTS = (() => {
@@ -99,6 +99,10 @@ export default function BookingSystem({ preselectedService = '' }) {
   const { lang } = useLanguage();
   const header = bookingHeaderT[lang] || bookingHeaderT.en;
   const formT = bookingFormT[lang] || bookingFormT.en;
+  const serviceOptions = SALON_SERVICES.map((service) => ({
+    value: service.bookingName,
+    label: service[lang]?.name || service.en.name,
+  }));
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -211,8 +215,8 @@ export default function BookingSystem({ preselectedService = '' }) {
               className="mt-3 w-full rounded-[28px] border border-[#D8B9A0] bg-[#FBF0E7] px-5 py-4 text-sm text-stone-900 outline-none transition duration-300 focus:border-[#C8A38D] focus:ring-2 focus:ring-[#E8CFC1]/60 appearance-none cursor-pointer"
             >
               <option value="" disabled>{formT.selectService}</option>
-              {BOOKING_SERVICE_OPTIONS.map((option) => (
-                <option key={option} value={option}>{option}</option>
+              {serviceOptions.map((option) => (
+                <option key={option.value} value={option.value}>{option.label}</option>
               ))}
             </select>
           </label>
