@@ -6,6 +6,7 @@
 import { ShieldCheck, Award, Heart } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useLanguage } from '../context/LanguageContext';
+import svetaImage from '../assets/sveta.jpeg';
 
 export default function About() {
   const { t } = useLanguage();
@@ -60,7 +61,7 @@ export default function About() {
               className="relative w-full aspect-[4/5] max-w-lg mx-auto rounded-[36px] overflow-hidden premium-shadow border-4 border-white z-10"
             >
               <img
-                src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?q=80&w=1000"
+                src={svetaImage}
                 alt="SvetArt Studio Atmosphere"
                 className="w-full h-full object-cover scale-101 hover:scale-105 transition-transform duration-700 ease-out"
               />
