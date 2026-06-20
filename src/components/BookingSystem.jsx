@@ -2,6 +2,14 @@ import { useState, useEffect } from 'react';
 import { SALON_SERVICES } from '../data/services';
 import { useLanguage } from '../context/LanguageContext';
 
+const MONTH_NAMES = {
+  en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+  ro: ['Ianuarie', 'Februarie', 'Martie', 'Aprilie', 'Mai', 'Iunie', 'Iulie', 'August', 'Septembrie', 'Octombrie', 'Noiembrie', 'Decembrie'],
+  ru: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+};
+
+const getDaysInMonth = (year, month) => new Date(year, month, 0).getDate();
+
 const TIME_SLOTS = (() => {
   const startMinutes = 8 * 60;
   const endMinutes = 23 * 60;
@@ -102,6 +110,11 @@ export default function BookingSystem({ preselectedService = '' }) {
   const { lang } = useLanguage();
   const header = bookingHeaderT[lang] || bookingHeaderT.en;
   const formT = bookingFormT[lang] || bookingFormT.en;
+  const monthNames = MONTH_NAMES[lang] || MONTH_NAMES.en;
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth() + 1;
+  const currentDay = currentDate.getDate();
   const serviceOptions = SALON_SERVICES.map((service) => ({
     value: service.bookingName,
     label: service[lang]?.name || service.en.name,
@@ -111,13 +124,16 @@ export default function BookingSystem({ preselectedService = '' }) {
   const [phone, setPhone] = useState('');
   const [service, setService] = useState('');
   const [date, setDate] = useState('');
+  const [selectedDay, setSelectedDay] = useState('');
+  const [selectedMonth, setSelectedMonth] = useState('');
   const [time, setTime] = useState('');
   const [specialRequest, setSpecialRequest] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
+  const [clockTick, setClockTick] = useState(Date.now());
   const [nextUrl, setNextUrl] = useState('');
   const [minDate, setMinDate] = useState('');
-  const [minTime, setMinTime] = useState('');
 
   const defaultNextUrl = typeof window !== 'undefined'
     ? `${window.location.origin}/thank-you.html`
@@ -127,12 +143,50 @@ export default function BookingSystem({ preselectedService = '' }) {
     if (typeof window !== 'undefined') {
       const now = new Date();
       const isoDate = now.toISOString().split('T')[0];
-      const isoTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
       setNextUrl(defaultNextUrl);
       setMinDate(isoDate);
-      setMinTime(isoTime);
     }
   }, [defaultNextUrl]);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setClockTick(Date.now());
+    }, 30000);
+
+    return () => window.clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    if (!selectedDay || !selectedMonth) {
+      setDate('');
+      return;
+    }
+
+    const dayNumber = Number(selectedDay);
+    const monthNumber = Number(selectedMonth);
+    const yearNumber = currentYear;
+    const nextDate = new Date(yearNumber, monthNumber - 1, dayNumber);
+    const isSameDate =
+      nextDate.getFullYear() === yearNumber &&
+      nextDate.getMonth() === monthNumber - 1 &&
+      nextDate.getDate() === dayNumber;
+
+    if (!isSameDate) {
+      setDate('');
+      return;
+    }
+
+    const isoDate = `${yearNumber}-${String(monthNumber).padStart(2, '0')}-${String(dayNumber).padStart(2, '0')}`;
+    const chosenDate = new Date(`${isoDate}T00:00:00`);
+    const today = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
+
+    if (chosenDate < today) {
+      setDate('');
+      return;
+    }
+
+    setDate(isoDate);
+  }, [selectedDay, selectedMonth, currentYear, currentDate]);
 
   useEffect(() => {
     if (preselectedService && BOOKING_SERVICE_OPTIONS.includes(preselectedService)) {
@@ -161,15 +215,50 @@ export default function BookingSystem({ preselectedService = '' }) {
 
   const isTimeSlotUnavailable = (slot) => {
     if (!date) return false;
-    if (date === minDate && minTime && slot < minTime) return true;
+    const now = new Date(clockTick);
+    const liveDate = now.toISOString().split('T')[0];
+    const liveTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    if (date === liveDate && slot < liveTime) return true;
     return false;
   };
+
+  const daysInSelectedMonth = selectedMonth
+    ? getDaysInMonth(currentYear, Number(selectedMonth))
+    : 31;
+
+  const monthOptions = Array.from({ length: 12 }, (_, index) => ({
+    value: String(index + 1),
+    label: monthNames[index],
+    disabled: index + 1 < currentMonth,
+  }));
+
+  const dayOptions = Array.from({ length: daysInSelectedMonth }, (_, index) => {
+    const dayNumber = index + 1;
+    const selectedMonthNumber = Number(selectedMonth || currentMonth);
+    const isPastDay =
+      selectedMonthNumber === currentMonth &&
+      dayNumber < currentDay;
+
+    return {
+      value: String(dayNumber),
+      label: String(dayNumber),
+      disabled: isPastDay,
+    };
+  });
 
   const handleSubmit = (e) => {
     if (!date || !time) {
       e.preventDefault();
       return;
     }
+
+    if (isTimeSlotUnavailable(time)) {
+      e.preventDefault();
+      setSubmitError(formT.timeUnavailableError);
+      return;
+    }
+
+    setSubmitError('');
     setIsSubmitting(true);
     // Allow the native form to submit directly to formsubmit.co
   };
@@ -198,6 +287,12 @@ export default function BookingSystem({ preselectedService = '' }) {
           </div>
         )}
 
+        {submitError && (
+          <div className="mb-6 rounded-[30px] border border-rose-200 bg-rose-50 px-6 py-4 text-sm text-rose-700 shadow-sm">
+            {submitError}
+          </div>
+        )}
+
         <form
           action="https://formsubmit.co/learsiando%40gmail.com"
           method="POST"
@@ -207,7 +302,6 @@ export default function BookingSystem({ preselectedService = '' }) {
           <input type="hidden" name="_subject" value="New booking request from SvetArt" />
           <input type="hidden" name="_captcha" value="false" />
           <input type="hidden" name="_next" value={nextUrl || defaultNextUrl} />
-
           <label className="block rounded-[32px] border border-[#E9D2C6] bg-[#FFF8F3] p-5 shadow-[0_18px_45px_rgba(148,94,77,0.08)]">
             <span className="text-sm font-semibold text-stone-700">{formT.service}</span>
             <select
@@ -266,15 +360,43 @@ export default function BookingSystem({ preselectedService = '' }) {
           <div className="grid gap-6 md:grid-cols-2">
             <label className="block rounded-[32px] border border-[#E9D2C6] bg-[#FFF8F3] p-5 shadow-[0_18px_45px_rgba(148,94,77,0.08)]">
               <span className="text-sm font-semibold text-stone-700">{formT.preferredDate}</span>
-              <input
-                type="date"
-                name="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                required
-                min={minDate}
-                className="mt-3 w-full rounded-[28px] border border-[#D8B9A0] bg-[#FBF0E7] px-5 py-4 text-sm text-stone-900 outline-none transition duration-300 focus:border-[#C8A38D] focus:ring-2 focus:ring-[#E8CFC1]/60"
-              />
+              <input type="hidden" name="date" value={date} />
+              <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                <select
+                  value={selectedMonth}
+                  onChange={(e) => {
+                    setSelectedMonth(e.target.value);
+                    setSubmitError('');
+                  }}
+                  required
+                  className="w-full rounded-[28px] border border-[#D8B9A0] bg-[#FBF0E7] px-4 py-4 text-sm text-stone-900 outline-none transition duration-300 focus:border-[#C8A38D] focus:ring-2 focus:ring-[#E8CFC1]/60 appearance-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-65"
+                >
+                  <option value="" disabled>Month</option>
+                  {monthOptions.map((option) => (
+                    <option key={option.value} value={option.value} disabled={option.disabled}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+
+                <select
+                  value={selectedDay}
+                  onChange={(e) => {
+                    setSelectedDay(e.target.value);
+                    setSubmitError('');
+                  }}
+                  required
+                  className="w-full rounded-[28px] border border-[#D8B9A0] bg-[#FBF0E7] px-4 py-4 text-sm text-stone-900 outline-none transition duration-300 focus:border-[#C8A38D] focus:ring-2 focus:ring-[#E8CFC1]/60 appearance-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-65"
+                >
+                  <option value="" disabled>Day</option>
+                  {dayOptions.map((option) => (
+                    <option key={option.value} value={option.value} disabled={option.disabled}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+
+              </div>
             </label>
 
             <label className="block rounded-[32px] border border-[#E9D2C6] bg-[#FFF8F3] p-5 shadow-[0_18px_45px_rgba(148,94,77,0.08)]">
@@ -282,7 +404,10 @@ export default function BookingSystem({ preselectedService = '' }) {
               <select
                 name="time"
                 value={time}
-                onChange={(e) => setTime(e.target.value)}
+                onChange={(e) => {
+                  setTime(e.target.value);
+                  setSubmitError('');
+                }}
                 required
                 disabled={!date}
                 className="mt-3 w-full rounded-[28px] border border-[#D8B9A0] bg-[#FBF0E7] px-5 py-4 text-sm text-stone-900 outline-none transition duration-300 focus:border-[#C8A38D] focus:ring-2 focus:ring-[#E8CFC1]/60 appearance-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-65"
