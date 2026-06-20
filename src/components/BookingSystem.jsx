@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { SALON_SERVICES } from '../data/services';
+import { BOOKING_SERVICE_OPTIONS, SALON_SERVICES } from '../data/services';
 import { useLanguage } from '../context/LanguageContext';
 
 const MONTH_NAMES = {
@@ -136,7 +136,7 @@ export default function BookingSystem({ preselectedService = '' }) {
   const [minDate, setMinDate] = useState('');
 
   const defaultNextUrl = typeof window !== 'undefined'
-    ? `${window.location.origin}/thank-you.html`
+    ? `${window.location.origin}/thank-you.html?lang=${encodeURIComponent(lang)}`
     : '/thank-you.html';
 
   useEffect(() => {

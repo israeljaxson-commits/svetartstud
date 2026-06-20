@@ -127,18 +127,80 @@
   </head>
   <body>
     <main class="card">
-      <span class="badge">SvetArt Beauty Studio</span>
-      <h1>Booking Confirmed!</h1>
-      <p>
-        Thank you for booking with us. We are excited to welcome you and make your visit feel
-        beautiful from the moment you arrive.
+      <span class="badge" id="badge-text">SvetArt Beauty Studio</span>
+      <h1 id="title-text">Booking Confirmed!</h1>
+      <p id="body-text">
+        Thank you for booking with us. We are excited to welcome you and make your visit feel beautiful from the moment you arrive.
       </p>
 
       <div class="button-wrap">
-        <a class="button" href="/">Return to Home</a>
+        <a class="button" id="home-link" href="/">Return to Home</a>
       </div>
 
-      <p class="footer-note">If you need to update your appointment, contact us anytime.</p>
+      <p class="footer-note" id="footer-text">If you need to update your appointment, contact us anytime.</p>
     </main>
+
+    <script>
+      (function () {
+        var translations = {
+          en: {
+            title: 'Booking Confirmed!',
+            body: 'Thank you for booking with us. We are excited to welcome you and make your visit feel beautiful from the moment you arrive.',
+            cta: 'Return to Home',
+            footer: 'If you need to update your appointment, contact us anytime.',
+            pageTitle: 'Booking Confirmed | SvetArt Beauty Studio',
+            pageDescription: 'Thank you for booking with SvetArt Beauty Studio. Your appointment is confirmed.'
+          },
+          ro: {
+            title: 'Rezervare Confirmată!',
+            body: 'Îți mulțumim pentru rezervare. Abia așteptăm să te întâmpinăm și să facem vizita ta frumoasă din primul moment.',
+            cta: 'Înapoi la Acasă',
+            footer: 'Dacă vrei să modifici programarea, contactează-ne oricând.',
+            pageTitle: 'Rezervare Confirmată | SvetArt Beauty Studio',
+            pageDescription: 'Îți mulțumim că ai rezervat la SvetArt Beauty Studio. Programarea ta este confirmată.'
+          },
+          ru: {
+            title: 'Запись Подтверждена!',
+            body: 'Спасибо за запись. Мы будем рады вас встретить и сделать ваш визит прекрасным с первых минут.',
+            cta: 'Вернуться На Главную',
+            footer: 'Если нужно изменить запись, свяжитесь с нами в любое время.',
+            pageTitle: 'Запись Подтверждена | SvetArt Beauty Studio',
+            pageDescription: 'Спасибо за запись в SvetArt Beauty Studio. Ваша запись подтверждена.'
+          }
+        };
+
+        var params = new URLSearchParams(window.location.search);
+        var queryLang = params.get('lang');
+        var savedLang = localStorage.getItem('svetart_lang');
+        var lang = 'en';
+
+        if (queryLang === 'en' || queryLang === 'ro' || queryLang === 'ru') {
+          lang = queryLang;
+        } else if (savedLang === 'en' || savedLang === 'ro' || savedLang === 'ru') {
+          lang = savedLang;
+        }
+
+        localStorage.setItem('svetart_lang', lang);
+        document.documentElement.lang = lang;
+
+        var t = translations[lang];
+        document.title = t.pageTitle;
+
+        var descriptionMeta = document.querySelector('meta[name="description"]');
+        if (descriptionMeta) {
+          descriptionMeta.setAttribute('content', t.pageDescription);
+        }
+
+        var titleEl = document.getElementById('title-text');
+        var bodyEl = document.getElementById('body-text');
+        var ctaEl = document.getElementById('home-link');
+        var footerEl = document.getElementById('footer-text');
+
+        if (titleEl) titleEl.textContent = t.title;
+        if (bodyEl) bodyEl.textContent = t.body;
+        if (ctaEl) ctaEl.textContent = t.cta;
+        if (footerEl) footerEl.textContent = t.footer;
+      })();
+    </script>
   </body>
 </html>
