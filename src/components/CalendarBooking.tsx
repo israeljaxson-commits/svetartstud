@@ -655,7 +655,7 @@ export default function CalendarBooking({ preselectedServiceId = '', onBookingCo
             >
               <h4 className="font-serif text-lg font-bold text-[#2C2523]">{dict.step3}</h4>
               <form
-                action="https://formsubmit.co/learsiando%40gmail.com"
+                action="https://formsubmit.co/motoc05andreea%40gmail.com"
                 method="POST"
                 target="_blank"
                 rel="noopener noreferrer"
